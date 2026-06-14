@@ -10,7 +10,7 @@ The authoritative, commit-level history lives in [`CHANGELOG.md`](https://github
 
 Double-click apps, so a packed mirror opens like a real desktop app instead of a terminal program.
 
-- **`kage pack --format app`** wraps the viewer in a double-click app with the site's favicon as its icon. On macOS that is a `.app` bundle; on Linux, with a Linux `--base`, an [AppImage](https://appimage.org)-style `.AppDir` that becomes a single `.AppImage` when `appimagetool` is installed. The icon is pulled from the mirror automatically, or set with `--icon`.
+- **`kage pack --app`** wraps the viewer in a double-click app with the site's favicon as its icon. The flag builds on the binary format, so it composes with `--base` (including a `webview` base) and `--icon`. On macOS that is a `.app` bundle; on Linux, with a Linux `--base`, an [AppImage](https://appimage.org)-style `.AppDir` that becomes a single `.AppImage` when `appimagetool` is installed. The icon is pulled from the mirror automatically, or set with `--icon`.
 - **A GUI-subsystem Windows base** ships in the release as `kage_<version>_windows-gui_<arch>.zip`. Pack a viewer onto it with `--format binary --base` and the resulting `.exe` opens with no console window behind it.
 - **Smarter cross-platform packing.** kage reads the base binary's executable header to detect its target OS, so a Windows viewer always gets a `.exe` name and the right run hint, regardless of how the base file is named.
 

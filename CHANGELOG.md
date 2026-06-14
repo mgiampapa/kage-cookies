@@ -8,14 +8,15 @@ All notable changes to kage are recorded here. The format follows
 
 ### Added
 
-- `kage pack --format app` wraps the packed viewer in a double-click desktop app
-  with the site's favicon as the icon. On macOS it writes a `.app` bundle
-  (`Info.plist`, the viewer under `Contents/MacOS`, and an `.icns` generated from
-  the favicon); on Linux, with a Linux `--base`, it writes an AppImage-style
-  `.AppDir` and folds it into a single `.AppImage` when `appimagetool` is
-  installed. The icon is found in the mirror automatically (preferring a large
-  `apple-touch-icon.png`, then `favicon.png` or a PNG-based `favicon.ico`) and
-  can be overridden with `--icon`.
+- `kage pack --app` wraps the packed viewer in a double-click desktop app with
+  the site's favicon as the icon. The flag builds on the binary format, so it
+  composes with `--base` (including a `webview` base) and `--icon`. On macOS it
+  writes a `.app` bundle (`Info.plist`, the viewer under `Contents/MacOS`, and an
+  `.icns` generated from the favicon); on Linux, with a Linux `--base`, it writes
+  an AppImage-style `.AppDir` and folds it into a single `.AppImage` when
+  `appimagetool` is installed. The icon is found in the mirror automatically
+  (preferring a large `apple-touch-icon.png`, then `favicon.png` or a PNG-based
+  `favicon.ico`) and can be overridden with `--icon`.
 - The release now ships a GUI-subsystem Windows base,
   `kage_<version>_windows-gui_<arch>.zip`. Packing a viewer onto it with
   `--format binary --base` produces a `.exe` that opens with no console window

@@ -21,6 +21,7 @@ type packFlags struct {
 	format      string
 	out         string
 	base        string
+	app         bool
 	icon        string
 	noCompress  bool
 	title       string
@@ -38,18 +39,19 @@ func newPackCmd() *cobra.Command {
 			"it writes an open ZIM archive (the format Kiwix uses) that kage open or any\n" +
 			"ZIM reader can browse. With --format binary it appends that archive to a copy\n" +
 			"of kage, producing a single executable that serves the site offline when run.\n" +
-			"With --format app it wraps that executable in a macOS .app you can double-click,\n" +
-			"with the site's favicon as the icon.",
+			"Add --app to wrap that executable in a double-click desktop app (a .app bundle\n" +
+			"on macOS, an AppImage-style .AppDir on Linux) with the site's favicon as the icon.",
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runPack(args[0], f)
 		},
 	}
 	fs := cmd.Flags()
-	fs.StringVar(&f.format, "format", "zim", "output format: zim, binary, or app")
+	fs.StringVar(&f.format, "format", "zim", "output format: zim or binary")
 	fs.StringVarP(&f.out, "out", "o", "", "output path (default per format)")
-	fs.StringVar(&f.base, "base", "", "base kage binary for binary/app (default this kage)")
-	fs.StringVar(&f.icon, "icon", "", "icon file for --format app (default the site's favicon)")
+	fs.StringVar(&f.base, "base", "", "base kage binary for the viewer (default this kage)")
+	fs.BoolVar(&f.app, "app", false, "wrap the viewer in a double-click desktop app (.app on macOS, .AppImage/.AppDir on Linux)")
+	fs.StringVar(&f.icon, "icon", "", "icon file for --app (default the site's favicon)")
 	fs.BoolVar(&f.noCompress, "no-compress", false, "store every cluster raw, no zstd")
 	fs.StringVar(&f.title, "title", "", "archive title (default the main page's <title>)")
 	fs.StringVar(&f.description, "description", "", "archive description")
@@ -68,6 +70,12 @@ func runPack(mirrorArg string, f *packFlags) error {
 		Language:    f.language,
 		Date:        f.date,
 		Version:     Version,
+	}
+
+	// --app wraps the packed viewer in a desktop bundle. It builds on the binary
+	// format, so it owns the flow rather than being one more --format value.
+	if f.app {
+		return runPackApp(dir, f, zopts)
 	}
 
 	switch f.format {
@@ -103,11 +111,8 @@ func runPack(mirrorArg string, f *packFlags) error {
 		printRunHint(path, target)
 		return nil
 
-	case "app":
-		return runPackApp(dir, f, zopts)
-
 	default:
-		return fmt.Errorf("unknown --format %q (want zim, binary, or app)", f.format)
+		return fmt.Errorf("unknown --format %q (want zim or binary)", f.format)
 	}
 }
 
@@ -122,7 +127,7 @@ func runPackApp(dir string, f *packFlags, zopts pack.ZIMOptions) error {
 		return fmt.Errorf("a Windows app is just the .exe, with no bundle to build: use --format binary and a GUI base (kage built with -ldflags -H=windowsgui)")
 	case "":
 		if f.base != "" {
-			return fmt.Errorf("--format app could not tell which OS %q is for; pass a macOS or Linux kage as --base", f.base)
+			return fmt.Errorf("--app could not tell which OS %q is for; pass a macOS or Linux kage as --base", f.base)
 		}
 		// No base and an unknown runtime: fall through with the host's GOOS.
 		target = runtime.GOOS
@@ -148,7 +153,7 @@ func runPackApp(dir string, f *packFlags, zopts pack.ZIMOptions) error {
 	case "linux":
 		return packLinuxApp(zbytes, dir, f, prog, name, icon, iconSrc)
 	default:
-		return fmt.Errorf("--format app supports macOS and Linux bases; %s is not one of them", osLabel(target))
+		return fmt.Errorf("--app supports macOS and Linux bases; %s is not one of them", osLabel(target))
 	}
 }
 

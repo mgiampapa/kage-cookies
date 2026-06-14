@@ -160,22 +160,22 @@ The trade is size. The binary carries a whole kage, so it weighs around 13 MiB p
 
 ### A double-click app
 
-A bare binary is great from a terminal, but double-click it in a file manager and the experience is rough: macOS opens a Terminal window behind the site, and on Windows a console flashes up next to it. `--format app` wraps the same viewer in a proper desktop app so a double-click just opens the site, no terminal, with the mirror's own favicon as the icon.
+A bare binary is great from a terminal, but double-click it in a file manager and the experience is rough: macOS opens a Terminal window behind the site, and on Windows a console flashes up next to it. Add `--app` and kage wraps the same viewer in a proper desktop app so a double-click just opens the site, no terminal, with the mirror's own favicon as the icon.
 
 On macOS you get a real `.app` bundle:
 
 ```bash
-kage pack paulgraham.com --format app          # -> paulgraham.app
+kage pack paulgraham.com --app                 # -> paulgraham.app
 open paulgraham.app                            # or double-click it in Finder
 ```
 
 On Linux, point `--base` at a Linux kage and you get an [AppImage](https://appimage.org)-style `.AppDir` with a `.desktop` launcher (`Terminal=false`, so no console). If [`appimagetool`](https://github.com/AppImage/appimagetool) is installed, kage folds it into a single double-clickable `.AppImage` for you:
 
 ```bash
-kage pack paulgraham.com --format app --base kage-linux-amd64   # -> paulgraham.AppDir (+ .AppImage)
+kage pack paulgraham.com --app --base kage-linux-amd64   # -> paulgraham.AppDir (+ .AppImage)
 ```
 
-kage finds the icon by digging the favicon out of the mirror (it prefers a large `apple-touch-icon.png` and falls back to `favicon.ico`); pass `--icon some.png` to override it. Pair `--format app` with a `webview` base (below) and the double-click opens a native window instead of the browser, which is the full "it's an app" effect.
+kage finds the icon by digging the favicon out of the mirror (it prefers a large `apple-touch-icon.png` and falls back to `favicon.ico`); pass `--icon some.png` to override it. Pair `--app` with a `webview` base (below) and the double-click opens a native window instead of the browser, which is the full "it's an app" effect.
 
 Windows needs no bundle, because there a single `.exe` already is the app. The catch is the console window. The release ships a `kage_<version>_windows-gui_<arch>.zip` whose binary is linked for the GUI subsystem, so a viewer packed onto it opens with no console behind it:
 
